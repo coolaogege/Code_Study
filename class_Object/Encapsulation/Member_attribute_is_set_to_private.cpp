@@ -27,6 +27,7 @@ public:
 	}
 	//设置年龄
 	void setAge(int age) {
+        // 设置一个有效的范围
 		if (age < 0 || age > 150) {
 			cout << "error" << endl;
 			return;
