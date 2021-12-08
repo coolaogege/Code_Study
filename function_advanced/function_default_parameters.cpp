@@ -24,8 +24,9 @@ int func2(int a, int b) {
 
 int main() {
 
-	cout << "ret = " << func(20, 20) << endl;
-	cout << "ret = " << func(100) << endl;
+	cout << "ret = " << func(20, 20) << endl;  // 传了  就用自己的数据
+	cout << "ret = " << func(100) << endl;    // 没传  就用默认的值
+	cout << "ret = " << func2() << endl;
 
 	system("pause");
 
