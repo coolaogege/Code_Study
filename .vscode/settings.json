@@ -46,6 +46,9 @@
         "streambuf": "cpp",
         "thread": "cpp",
         "queue": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "forward_list": "cpp",
+        "bitset": "cpp",
+        "chrono": "cpp"
     }
 }
