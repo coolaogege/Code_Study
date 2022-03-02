@@ -1,14 +1,25 @@
+// Note:
+// 经常出现 归还内存的问题！！！  free()
+// 另外一个还是 & * 的问题！ 
+
 #include <iostream>
 
 using namespace std;
 
 
-//树的结点
+//树的结点  /  栈的结点  / 队列节点
 typedef struct node{
     int data;
     struct node* left;
     struct node* right;
+    struct node* next;
 } Node;
+
+//队列定义，队首指针和队尾指针
+typedef struct {
+    node *front;
+    node *rear;
+}queue;
 
 
 //树根
@@ -16,6 +27,67 @@ typedef struct {
     Node* root;
 } Tree;
 
+ 
+//初始化队列
+queue *init_queue(){
+    queue *q=(queue*)malloc(sizeof(queue));
+    if(q==NULL){    //建立失败，退出
+        exit(0);
+    }
+    //头尾结点均赋值NULL
+    q->front=NULL;  
+    q->rear=NULL;
+    return q;
+}
+ 
+//队列判空
+bool empty(queue *q){
+    if(q->front==NULL){
+        return true;    //1--表示真，说明队列非空
+    }
+    else{
+        return false;   //0--表示假，说明队列为空
+    }
+}
+ 
+//入队操作
+void push(queue *q , Node *elem){
+    Node *n = elem;
+    n->next=NULL;   //采用尾插入法
+    //if(q->rear==NULL){  
+    if(empty(q)){
+        q->front=n;
+        q->rear=n;
+    }else{
+        q->rear->next=n;    //n成为当前尾结点的下一结点
+        q->rear=n;  //让尾指针指向n
+    }
+}
+ 
+//出队操作
+void pop(queue *q , Node *elem){
+    Node *n=q->front;
+
+    *elem = *n;
+
+    if(empty(q)){
+        return ;    //此时队列为空，直接返回函数结束
+    }
+    if(q->front==q->rear){
+        q->front=NULL;  //只有一个元素时直接将两端指向制空即可
+        q->rear=NULL;
+
+        // free(n);        //记得归还内存空间
+
+    }
+    else{
+        q->front=q->front->next;
+
+        // free(n);
+
+    }
+}
+ 
 
 //创建树--插入数据
 void insert(Tree* tree, int value){
@@ -55,16 +127,6 @@ void insert(Tree* tree, int value){
     return;
 }
 
-//树的中序遍历 In-order traversal
-void inorder(Node* node){
-    if (node != NULL)
-    {
-        inorder(node->left);
-        // printf("%d ",node->data);
-        cout << node->data << "  " ;
-        inorder(node->right);
-    }
-}
 
 //树的先序遍历 Preorder traversal
 void preorder(Node* node){
@@ -77,6 +139,29 @@ void preorder(Node* node){
     }
 }
 
+//树的层次遍历 
+void levelOrder(Node* node){ 
+
+    // 创建一个节点
+    Node p;
+
+    // 初始化队列
+    queue *qu=init_queue();
+
+    // 根节点指针进入队列
+    push(qu , node);
+
+    while ( !empty(qu) ){  // 队列不为空时 ， 则循环
+        pop(qu , &p);
+        cout << p.data << "  " ;
+        if (p.left != NULL)
+            push(qu , p.left);  // 有左子树  进队
+        if (p.right != NULL)
+            push(qu , p.right); // 有右子树  进队
+    }
+}
+
+
 //树的后序遍历 Post-order traversal
 void postorder(Node* node){
     if (node != NULL)
@@ -87,8 +172,8 @@ void postorder(Node* node){
         cout << node->data << "  " ;
     }
 }
-
-  
+ 
+//主函数调用，这里只是简单介绍用法
 int main(){
     Tree tree;
     tree.root = NULL;//创建一个空树
@@ -106,7 +191,7 @@ int main(){
   
     preorder(tree.root);   //前序遍历
     cout << endl;
-    inorder(tree.root);    //中序遍历
+    levelOrder(tree.root);  //层次遍历
     cout << endl;
     postorder(tree.root);  //后序遍历
     cout << endl;
