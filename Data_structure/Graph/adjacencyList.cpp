@@ -7,20 +7,21 @@ using namespace std;
 typedef char VerTexType;    // 设置顶点数据类型为字符型
 typedef int OtherInfo;      // 设置边数据类型为整型
 
-// 顶点的节点结构
-typedef struct {
-    VerTexType data;     // 顶点信息
-    ArcNode * firstarc;  // 指向第一条依附该顶点的边的指针
-
-}VNode , AdjList[MVNum]; // AdjList表示邻接表类型 ---> AdjLit v;
-
 // 边结点结构
-typedef struct {
+typedef struct ArcNode{
     int adjvex;          // 该边所指向的顶点的位置
     OtherInfo info;      // 和边相关的信息
     struct ArcNode * nextarc;   // 指向下一条边的结点地址的指针
 
 }ArcNode; 
+
+// 顶点的节点结构
+typedef struct VNode{
+    VerTexType data;     // 顶点信息
+    ArcNode * firstarc;  // 指向第一条依附该顶点的边的指针
+
+}VNode , AdjList[MVNum]; // AdjList表示邻接表类型 ---> AdjLit v;
+
 
 // 图的结构的定义
 typedef struct {

@@ -4,23 +4,23 @@ using namespace std;
 #define MVNum 100       // 最大顶点数
 #define MaxInt 32767    // 表示极大值 无穷
 
-typedef char VerTexType;    // 设置顶点数据类型为字符型
+typedef int VerTexType;    // 设置顶点数据类型为字符型
 typedef int OtherInfo;      // 设置边数据类型为整型
 
-// 顶点的节点结构
-typedef struct {
-    VerTexType data;     // 顶点信息
-    ArcNode * firstarc;  // 指向第一条依附该顶点的边的指针
-
-}VNode , AdjList[MVNum]; // AdjList表示邻接表类型 ---> AdjLit v;
-
 // 边结点结构
-typedef struct {
+typedef struct ArcNode{
     int adjvex;          // 该边所指向的顶点的位置
     OtherInfo info;      // 和边相关的信息
     struct ArcNode * nextarc;   // 指向下一条边的结点地址的指针
 
 }ArcNode; 
+
+// 顶点的节点结构
+typedef struct VNode{
+    VerTexType data;     // 顶点信息
+    ArcNode * firstarc;  // 指向第一条依附该顶点的边的指针
+
+}VNode , AdjList[MVNum]; // AdjList表示邻接表类型 ---> AdjLit v;
 
 // 图的结构的定义
 typedef struct {
@@ -80,7 +80,7 @@ bool empty(queue *q){
 }
  
 //入队操作
-void push(queue *q,int data){
+void push(queue *q , int data){
     node *n =init_node();
     n->data=data;
     n->next=NULL;   //采用尾插入法
@@ -95,26 +95,22 @@ void push(queue *q,int data){
 }
  
 //出队操作
-void pop(queue *q , Node *elem){
-    Node *n=q->front;
-
-    *elem = *n;
-
+void pop(queue *q , int *data){
+    node *n=q->front;
     if(empty(q)){
         return ;    //此时队列为空，直接返回函数结束
     }
+
+    *data = n->data ; 
+
     if(q->front==q->rear){
         q->front=NULL;  //只有一个元素时直接将两端指向制空即可
         q->rear=NULL;
-
         // free(n);        //记得归还内存空间
-
     }
     else{
         q->front=q->front->next;
-
         // free(n);
-
     }
 }
 
@@ -162,22 +158,28 @@ void CreatUND(ALGraph &G){
         i = LocateVex(G , v1);  
         j = LocateVex(G , v2);
         // 建立边结点
-        ArcNode p1;
+
+        // ArcNode *p2;   ----> 出错的地方！！ 第二次指针还是这个地址！  应该新开辟一个结点！ 正确的方式如下
+        // ArcNode *p1=(ArcNode*)malloc(sizeof(ArcNode));
+        ArcNode *p1 = new ArcNode;
+
         // 邻接点的序号
-        p1.adjvex = j; 
+        p1->adjvex = j; 
         // 头插法
-        p1.nextarc = G.vertices[i].firstarc;  
-        G.vertices[i].firstarc = &p1;
+        p1->nextarc = G.vertices[i].firstarc;  
+        G.vertices[i].firstarc = p1;
 
         // 无向的，因此需要给另一个也要插入结点   同样的操作 
 
         // 建立边结点
-        ArcNode p2;
+        // ArcNode *p2;
+        ArcNode *p2 = new ArcNode;
+
         // 邻接点的序号
-        p2.adjvex = i; 
+        p2->adjvex = i; 
         // 头插法
-        p2.nextarc = G.vertices[j].firstarc;  
-        G.vertices[j].firstarc = &p2;        
+        p2->nextarc = G.vertices[j].firstarc;  
+        G.vertices[j].firstarc = p2;        
     }
     
 }
@@ -195,33 +197,53 @@ void BFSGraphUND(ALGraph G , int v){
     // 节点进入队列
     push(Q , v);
 
+    int u;
+
     // 当队列不为空时
     while( !empty(Q) ){
-        // 队头元素出队 并置为u
-        pop(Q , u);
+        // 队头元素出队 并置为u  
+        pop(Q , &u);
         // 遍历此结点的所有边结点 ---> 即对每一条单链表进行遍历
-        for (int w = FirstAdjVex(G , u); w >= G.vexnum; w = NextAdjVex(G , u , w)){
-
-            if (!visted[w]){ // 如果w未被访问过
-                // 输出w结点，并且访问状态置为1
-                cout << w << endl; 
-                visted[w] = 1;
-                // 节点进入队列
-                push(Q , v);
+        ArcNode * p = G.vertices[u-1].firstarc;
+        while (p != NULL){
+            if (!visted[p->adjvex]){ // 如果未被访问过
+            // 输出结点，并且访问状态置为1
+                cout << p->adjvex + 1 << endl;   
+                visted[p->adjvex] = 1;
             }
-
+            v = p->adjvex + 1;
+            p = p->nextarc;          
         }
+        // 节点进入队列
+        push(Q , v);  
     }
      
 } 
+
+/* 
+8 9
+
+1 2 3 4 5 6 7 8
+
+1 2 1 
+1 3 1
+2 4 1
+2 5 1
+3 6 1
+3 7 1
+4 8 1
+5 8 1 
+6 7 1
+*/
+
 
 int main(){ 
     // 创建一个图
     ALGraph Graph;
     // 创建无向网 UND
     CreatUND(Graph);
-    // 广度优先遍历无向图 ----> 起始结点设为2
-    BFSGraphUND(Graph , 2);
+    // 广度优先遍历无向图 ----> 起始结点设为1
+    BFSGraphUND(Graph , 1);
 
 
     system("pause");
