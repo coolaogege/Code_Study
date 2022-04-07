@@ -38,6 +38,14 @@ int singleNumber(int* nums, int numsSize){
 }
 
 
+// Leetcode example
+int Leetcode_singleNumber(int* nums, int numsSize)
+{
+    
+}
+
+
+
 int main(){
 
     int a[5] = {4,1,2,1,2};
